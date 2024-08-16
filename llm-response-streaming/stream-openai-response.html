@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream LLM response</title>
+</head>
+<body>
+    <div>
+        <h3>Streaming LLM response...</h3>
+        <div>
+            <ul id="responseList">
+            </ul>
+        </div>
+    </div>
+</body>
+<script>
+    const responseList = document.getElementById('responseList');
+    const source = new EventSource('http://localhost:8000/stream-openai-response');
+
+    source.onmessage = function(event) {
+        if (event.data === '[DONE]') {
+            source.close();
+            return;
+        }
+        let content = JSON.parse(event.data)?.choices[0]?.delta?.content
+        const li = document.createElement('li');
+        li.textContent = JSON.parse(event.data)?.choices[0]?.delta?.content
+        responseList.appendChild(li);
+    };
+    source.onerror = function(event) {
+        console.error('EventSource failed:', event);
+        source.close();
+    };
+
+</script>
+</html>

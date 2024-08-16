@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream Numbers</title>
+</head>
+<body>
+    <h3>Streaming numbers...</h3>
+    <div>
+        <ul id="numbersList">
+
+        </ul>
+    </div>
+</body>
+<script>
+    const numbersList = document.getElementById('numbersList');
+    const source = new EventSource('http://localhost:8000/stream-numbers-10');
+
+    source.onmessage = function(event) {
+        if (event.data === '[DONE]') {
+            source.close();
+            return;
+        }
+        const li = document.createElement('li');
+        li.textContent = event.data;
+        console.log(event);
+        numbersList.appendChild(li);
+    };
+
+    source.onerror = function(event) {
+        console.error('EventSource failed:', event);
+        source.close();
+    };
+</script>
+</html>
